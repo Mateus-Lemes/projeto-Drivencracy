@@ -15,3 +15,20 @@ export async function pollCreatedController(req, res) {
         res.status(error.status).send(`erro ${error.status} no servidor`, console.log(error, error.status));
     }
 }
+
+export async function getPollsController(req, res) {
+    try {
+        const polls = await db.collection("polls").find({}).toArray();
+        if(!polls) {
+            res.status(404).send("Não foi encontrada nenhuma enquete!");
+        } else {
+            res.sendStatus(200);
+        }
+            
+    } catch (error) {
+        res.sendStatus(error.status);
+    }
+
+
+    
+}
