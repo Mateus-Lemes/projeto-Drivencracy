@@ -22,7 +22,7 @@ export async function getPollsController(req, res) {
         if(!polls) {
             res.status(404).send("Não foi encontrada nenhuma enquete!");
         } else {
-            res.sendStatus(200);
+            res.status(200).send(polls);
         }
             
     } catch (error) {

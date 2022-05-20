@@ -4,3 +4,8 @@ export const pollSchema = joi.object({
     title: joi.string().required(),
     expireAt: joi.string()
 });
+
+export const choiceSchema = joi.object({
+    title: joi.string().required(),
+    pollId: joi.string().required()
+});
