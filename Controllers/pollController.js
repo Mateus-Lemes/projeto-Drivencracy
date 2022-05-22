@@ -1,12 +1,16 @@
+import dayjs from "dayjs";
 import db from "../db.js";
 
 export async function pollCreatedController(req, res) {
     try {
-        const pollCreated = req.body;
-        const {title} = pollCreated;
+        const expireAt = res.locals.expireAt
+        const {title} = req.body;
         const oldTitle = await db.collection("polls").findOne({title});
         if (!oldTitle) {
-            await db.collection("polls").insertOne(pollCreated);
+            await db.collection("polls").insertOne({
+                title,
+                expireAt: expireAt || dayjs().add(30, "day").format("YYYY-MM-D hh:mm")
+            });
             res.status(201).send("Enquete criada com sucesso!");
         } else {
             res.status(409).send("Já existe uma enquete com esse título, por favor, escolha outro.")

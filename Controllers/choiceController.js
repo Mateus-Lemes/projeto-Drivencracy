@@ -1,13 +1,14 @@
 import db from "../db.js";
 import { ObjectId } from "mongodb";
+import dayjs from "dayjs";
 
 export async function choiceCreatedController(req, res) {
     try {
         const choiceCreated = req.body;
         const { pollId, title } = choiceCreated;
+        const choiceWhitVote = {...choiceCreated, vote: 0}
 
         const pollExist = await db.collection("polls").findOne({_id: new ObjectId(pollId)});
-        console.log(pollExist)
         if(!pollExist) {
             return res.status(404).send("Não existe esta enquete!");
         }
@@ -17,7 +18,7 @@ export async function choiceCreatedController(req, res) {
             return res.status(409).send("Já existe uma opção com esse título, por favor, escolha outro!")
         }
 
-        db.collection("choices").insertOne(choiceCreated);
+        db.collection("choices").insertOne(choiceWhitVote);
         res.status(201).send("Escolha criada com sucesso!");
 
     } catch (error) {
@@ -38,6 +39,21 @@ export async function getChoices(req, res) {
         }
 
         res.status(200).send(choices);
+
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
+
+export async function vote(req, res) {
+    try {
+        const id = req.params
+        const choice = await db.collection("choices").findOne({_id: new ObjectId(id)});
+        await db.collection("choices").updateOne({_id: new ObjectId(id)}, {$inc: {vote: 1}});
+        await db.collection("choices").updateOne({_id: new ObjectId(id)}, {$set: {date: dayjs().format("DD-MM-YYYY hh:mm")}});
+        const {title} = choice
+        res.status(201).send(`Obrigado por votar! Sua escolha foi: ${title}`);
 
     } catch (error) {
         console.log(error);
