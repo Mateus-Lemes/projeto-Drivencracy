@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { ObjectId } from "mongodb";
 import db from "../db.js";
 
 export async function pollCreatedController(req, res) {
@@ -16,7 +17,7 @@ export async function pollCreatedController(req, res) {
             res.status(409).send("Já existe uma enquete com esse título, por favor, escolha outro.")
         }
     } catch (error) {
-        res.status(error.status).send(`erro ${error.status} no servidor`, console.log(error, error.status));
+        res.status(500).send(`erro 500 no servidor`, console.log(error, error.status));
     }
 }
 
@@ -30,9 +31,31 @@ export async function getPollsController(req, res) {
         }
             
     } catch (error) {
-        res.sendStatus(error.status);
+        res.sendStatus(500);
     }
+}
 
+export async function getPollResult(req, res) {
+    try {
+        const {id} = req.params
+        const poll = await db.collection("polls").findOne({_id: new ObjectId(id)});
+        const choices = await db.collection("choices").find({pollId: (id)}).toArray();
+        choices.sort((a, b)=> {
+            return a.vote < b.vote
+        });
 
-    
+        if(choices[0].vote === choices[1].vote ) {
+           return res.send("Há duas ou mais opções empatadas!");
+        }
+        const result = {
+            title: choices[0].title,
+            vote: choices[0].vote
+        }
+        const winnerChoice = {...poll, result};
+        res.status(200).send(winnerChoice);
+
+    } catch (error) {
+        res.sendStatus(500);
+        console.log(error)
+    }
 }

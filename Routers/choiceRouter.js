@@ -8,6 +8,6 @@ const choiceRouter = Router();
 
 choiceRouter.post("/choice", validationChoiceCreated, choiceCreatedController); //opção cadastrada
 choiceRouter.get("/poll/:id/choice", validationPollChoice, getChoices); //opções de uma enquete
-choiceRouter.post("/choice/:id/vote", validationVote, vote); //votar em uma opção
+choiceRouter.post("/choice/:id/vote", validationVote, vote);
 
 export default choiceRouter;
