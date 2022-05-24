@@ -14,6 +14,11 @@ export async function validationChoiceCreated(req, res, next) {
 
     const {pollId} = req.body
     const poll = await db.collection("polls").findOne({_id: new ObjectId(pollId)});
+
+    if(!poll) {
+        return res.status(404).send("Não existe esta enquete!");
+    }
+
     const {expireAt} = poll
     if (dayjs().isAfter(dayjs(expireAt))) {
         return res.status(403).send("Essa enquete já expirou!");

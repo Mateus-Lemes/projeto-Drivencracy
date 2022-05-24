@@ -5,13 +5,8 @@ import dayjs from "dayjs";
 export async function choiceCreatedController(req, res) {
     try {
         const choiceCreated = req.body;
-        const { pollId, title } = choiceCreated;
-        const choiceWhitVote = {...choiceCreated, vote: 0}
-
-        const pollExist = await db.collection("polls").findOne({_id: new ObjectId(pollId)});
-        if(!pollExist) {
-            return res.status(404).send("Não existe esta enquete!");
-        }
+        const { title } = choiceCreated;
+        const choiceWhitVote = {...choiceCreated, vote: 0};
 
         const oldTitle = await db.collection("choices").findOne({title});
         if (oldTitle) {
